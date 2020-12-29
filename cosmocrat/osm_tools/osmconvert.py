@@ -24,14 +24,18 @@ def set_osm_file_timestamp(input_path, new_timestamp):
     os.rename(temp_path, output_path)
     return output_path
 
-def drop_author(input_path):
+def drop_author(input_path, output_path=None):
     (input_dir, _, _, input_format) = deconstruct_file_path(input_path)
-    temp_path = os.path.join(input_dir, f'{str(uuid4())}.{input_format}')
+    output_not_given = False
+    if output_path is None:
+        output_not_given = True
+        output_path = os.path.join(input_dir, f'{str(uuid4())}.{input_format}')
     run_command_wrapper(f'{definitions.OSMCONVERT_PATH} \
                     --drop-author \
                     {input_path} \
-                    -o={temp_path} \
+                    -o={output_path} \
                     --verbose', 
                     subprocess_name=SUBPROCESS_NAME)
-    os.rename(temp_path, input_path)
+    if output_not_given:
+        os.rename(output_path, input_path)
     
