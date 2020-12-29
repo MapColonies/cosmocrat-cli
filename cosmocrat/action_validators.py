@@ -1,6 +1,7 @@
 import os
 import re
 import argparse
+import validators
 import cosmocrat.definitions as definitions
 
 class validate_input_path(argparse.Action):
@@ -26,3 +27,18 @@ class validate_timestamp(argparse.Action):
         if not re.match(definitions.TIMESTAMP_REGEX, timestamp):
             raise argparse.ArgumentTypeError(f'validate_timestamp: {timestamp} is not a valid timestmap')
         setattr(namespace, self.dest, timestamp)
+
+class validate_time_units_limit(argparse.Action):
+    def __call__(self, parser, namespace, values, option_string=None):
+        time_units = values
+        for time_unit in time_units:
+            if time_unit not in definitions.Time_Unit._member_names_:
+                raise argparse.ArgumentTypeError(f'validate_time_units_limit: {time_unit} is not a valid time unit')
+        setattr(namespace, self.dest, time_units)
+
+class validate_url(argparse.Action):
+    def __call__(self, parser, namespace, values, option_string=None):
+        url = values
+        if not validators.url(url):
+            raise argparse.ArgumentTypeError(f'validate_url: {url} is not a valid url')
+        setattr(namespace, self.dest, url)

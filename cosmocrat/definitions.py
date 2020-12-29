@@ -10,7 +10,7 @@ OSMOSIS_PATH='/usr/bin/osmosis'
 OSMUPDATE_PATH='/usr/bin/osmupdate'
 OSMCONVERT_PATH='/usr/bin/osmconvert'
 
-Time_Unit = Enum('Time_Unit', 'minute hour day')
+Time_Unit = Enum('Time_Unit', 'minute hour day week')
 Subprocess_Tool = Enum('Subprocess_Tool', 'osmosis osmupdate osmconvert')
 
 TEMP_PATH = tempfile.gettempdir()
@@ -23,6 +23,7 @@ POLYGONS_PATH = os.path.join(DATA_PATH, 'polygons')
 OSMUPDATE_CACHE_PATH = os.path.join(DATA_PATH, 'osmupdate_temp', 'temp')
 
 TIME_UNITS_IN_USE = ['hour', 'day']
+REPLICATION_SERVER_BASE_URL='https://planet.openstreetmap.org/replication'
 TIMESTAMP_REGEX = r'\b[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}\:[0-9]{2}\:[0-9]{2}Z\b'
 FORMATS_MAP = {
     'OSM_PBF': 'osm.pbf',
