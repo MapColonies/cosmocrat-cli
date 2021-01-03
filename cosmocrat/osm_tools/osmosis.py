@@ -47,7 +47,7 @@ def apply_changes_by_polygon(base_output_path, input_path, change_path, polygon_
     return output_path
 
 def create_delta(delta_path, delta_name, first_input_pbf_path, second_input_pbf_path, should_compress=False):
-    (compression_type, output_format) = get_compression_method(should_compress, default_format=definitions.FORMATS_MAP['OSC'])
+    (compression_type, output_format) = get_compression_method(should_compress, base_format=definitions.FORMATS_MAP['OSC'])
     output_name = f'{delta_name}.{output_format}'
     output_path = os.path.join(delta_path, output_name)
     run_command_wrapper(f'{definitions.OSMOSIS_PATH} \

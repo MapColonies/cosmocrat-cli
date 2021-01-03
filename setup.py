@@ -5,14 +5,19 @@ with open("README.md", "r") as fh:
 
 setup(
     name="cosmocrat-cli",
-    author="MC",
+    author="MapColonies",
     author_email="mapcolonies@gmail.com",
     description="osm tools wrapper cli",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/MapColonies/cosmocrat-cli",
     packages=find_packages(exclude=["tests"]),
-    install_requires=["osmeterium==0.0.3", "mapcoloniesjsonlogger==1.0.0"],
+    install_requires=[
+        "osmeterium==0.0.3",
+        "pytest",
+        "mapcoloniesjsonlogger==1.0.0",
+        "validators",
+    ],
     use_scm_version=True,
     setup_requires=["setuptools_scm"],
     classifiers=[

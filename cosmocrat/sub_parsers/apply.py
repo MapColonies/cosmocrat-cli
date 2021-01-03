@@ -1,6 +1,6 @@
-import shutil
 import cosmocrat.definitions as definitions
 
+from cosmocrat.helper_functions import safe_copy
 from cosmocrat.action_validators import validate_input_path, validate_output_path
 from cosmocrat.osm_tools.osmosis import apply_changes_by_polygon
 from cosmocrat.osm_tools.osmconvert import get_osm_file_timestamp, set_osm_file_timestamp
@@ -24,4 +24,4 @@ def apply(input_path, change_path, polygon_path, output_path):
                             polygon_path=polygon_path)
     changes_timestamp = get_osm_file_timestamp(change_path)
     set_osm_file_timestamp(applied_changes_path, changes_timestamp)
-    shutil.copy(applied_changes_path, output_path)
+    safe_copy(applied_changes_path, output_path)

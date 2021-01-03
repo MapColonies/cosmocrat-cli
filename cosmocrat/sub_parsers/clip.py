@@ -1,6 +1,6 @@
-import shutil
 import cosmocrat.definitions as definitions
 
+from cosmocrat.helper_functions import safe_copy
 from cosmocrat.action_validators import validate_input_path, validate_output_path
 from cosmocrat.osm_tools.osmosis import clip_polygon
 from cosmocrat.osm_tools.osmconvert import get_osm_file_timestamp, set_osm_file_timestamp
@@ -25,4 +25,4 @@ def clip(input_path, polygon_path, output_path, exist_ok):
                                 base_output_path=definitions.RESULTS_PATH,
                                 exist_ok=exist_ok)
     set_osm_file_timestamp(clipped_path, timestamp)
-    shutil.copy(clipped_path, output_path)
+    safe_copy(clipped_path, output_path)

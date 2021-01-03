@@ -1,7 +1,7 @@
-import shutil
 import cosmocrat.definitions as definitions
 import cosmocrat.action_validators as validators
 
+from cosmocrat.helper_functions import safe_copy
 from cosmocrat.osm_tools.osmupdate import get_changes_from_file, get_changes_from_timestamp
 
 def register_parser(sub_parser):
@@ -38,4 +38,4 @@ def update(input_path, timestamp, source, limited_time_units, output_path, outpu
                     source=source,
                     limited_time_units=limited_time_units)
 
-    shutil.copy(changes_path, output_path)
+    safe_copy(changes_path, output_path)

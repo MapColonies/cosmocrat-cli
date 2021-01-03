@@ -1,9 +1,8 @@
-import shutil
 import cosmocrat.definitions as definitions
 
 from cosmocrat.action_validators import validate_input_path, validate_output_path
 from cosmocrat.osm_tools.osmosis import create_delta
-from cosmocrat.helper_functions import deconstruct_file_path
+from cosmocrat.helper_functions import deconstruct_file_path, safe_copy
 
 def register_parser(sub_parser):
     parser_delta = sub_parser.add_parser('delta', help='Creates the delta (osm change) between two osm files')
@@ -24,4 +23,4 @@ def delta(first_input_path, second_input_path, output_path, compress):
                                 first_input_pbf_path=first_input_path,
                                 second_input_pbf_path=second_input_path,
                                 should_compress=compress)
-    shutil.copy(delta_path, output_path)
+    safe_copy(delta_path, output_path)

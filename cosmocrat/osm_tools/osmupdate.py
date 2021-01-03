@@ -38,9 +38,8 @@ def get_changes_from_timestamp(input_timestamp, changes_format, source, limited_
 
 def get_changes_from_file(input_path, changes_format, source, limited_time_units):
     temp_output_name = f'{uuid4()}.{changes_format}'
-
     output_path = os.path.join(definitions.OSMCHANGES_PATH, changes_format, temp_output_name)
-    
+
     run_command_wrapper(f'{definitions.OSMUPDATE_PATH} \
                     {input_path} \
                     {output_path} \

@@ -1,6 +1,7 @@
 import os
 import re
 import sys
+import shutil
 import subprocess
 import cosmocrat.definitions as definitions
 
@@ -27,26 +28,26 @@ def run_command_wrapper(command, subprocess_name=''):
                 log.info,
                 log.info,
                 subprocess_error_handler_wrapper(subprocess_name),
-                (lambda: log.info('subprocess finished successfully.')))
+                (lambda: log.info(f'subprocess {subprocess_name} finished successfully.')))
 
 def subprocess_get_stdout_output(args, subprocess_name=''):
     completed_process = subprocess.run(args=args,
                                         stdout=subprocess.PIPE,
                                         stderr=subprocess.PIPE,
                                         universal_newlines=True)
-    return_code = completed_process.returncode                   
+    return_code = completed_process.returncode
     if return_code is not 0:
         subprocess_error_handler_wrapper(subprocess_name,
                                         already_raised_exit_code=return_code)()
     output = completed_process.stdout
     return output.strip()
 
-def get_compression_method(compression, default_format=''):
+def get_compression_method(compression, base_format='', default_compression_method='gz'):
     compression_type = 'none'
-    compression_format = default_format
+    compression_format = base_format
     if compression:
-        compression_type = 'gzip'
-        compression_format += '.gz'
+        compression_type = definitions.COMPRESSION_METHOD_MAP.get(default_compression_method)
+        compression_format += f'.{default_compression_method}'
     return (compression_type, compression_format)
 
 def deconstruct_file_path(string):
@@ -97,3 +98,11 @@ def remove_dots_from_edges_of_string(input):
 
 def remove_datetime_from_string(input):
     return re.sub(definitions.TIMESTAMP_REGEX, '', input)
+
+def safe_copy(src, dst):
+    try:
+        shutil.copy(src, dst)
+    except shutil.SameFileError:
+        pass
+        
+        

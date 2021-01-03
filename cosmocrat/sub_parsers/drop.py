@@ -1,5 +1,3 @@
-import shutil
-
 from cosmocrat.action_validators import validate_input_path, validate_output_path
 from cosmocrat.osm_tools.osmconvert import drop_author
 

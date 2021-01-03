@@ -8,12 +8,12 @@ osmeterium = "==0.0.3"
 cosmocrat-cli = {editable = true, path = "."}
 pytest = "*"
 MapColoniesJSONLogger = "==1.0.0"
-pylint = "*"
 validators = "*"
 
 [dev-packages]
 rope = "*"
 twine = "*"
+pipenv-setup = "*"
 pylint = "*"
 
 [requires]

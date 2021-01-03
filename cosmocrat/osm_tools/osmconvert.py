@@ -38,4 +38,3 @@ def drop_author(input_path, output_path=None):
                     subprocess_name=SUBPROCESS_NAME)
     if output_not_given:
         os.rename(output_path, input_path)
-    
