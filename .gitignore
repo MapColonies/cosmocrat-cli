@@ -1,5 +1,6 @@
 .vscode/settings.json
 requirements.txt
+data
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

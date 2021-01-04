@@ -5,8 +5,6 @@ name = "pypi"
 
 [packages]
 osmeterium = "==0.0.3"
-cosmocrat-cli = {editable = true, path = "."}
-pytest = "*"
 MapColoniesJSONLogger = "==1.0.0"
 validators = "*"
 
@@ -15,6 +13,7 @@ rope = "*"
 twine = "*"
 pipenv-setup = "*"
 pylint = "*"
+cosmocrat-cli = {editable = true, path = "."}
 
 [requires]
 python_version = "3.6"

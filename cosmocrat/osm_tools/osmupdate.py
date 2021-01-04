@@ -14,7 +14,7 @@ def time_units_to_command_string(time_units):
             continue
         result += f'--{time_unit} '
     return result
-    
+
 def get_changes_from_timestamp(input_timestamp, changes_format, source, limited_time_units):
     temp_output_name = f'{uuid4()}.{changes_format}'
     output_path = os.path.join(definitions.OSMCHANGES_PATH, changes_format, temp_output_name)

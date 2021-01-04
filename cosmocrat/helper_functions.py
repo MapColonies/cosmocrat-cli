@@ -104,5 +104,3 @@ def safe_copy(src, dst):
         shutil.copy(src, dst)
     except shutil.SameFileError:
         pass
-        
-        

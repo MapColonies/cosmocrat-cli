@@ -29,7 +29,6 @@ def apply_changes_by_polygon(base_output_path, input_path, change_path, polygon_
 
     compression_type = definitions.COMPRESSION_METHOD_MAP[changes_format]
 
-    # TODO: refactor
     if len(changes_timestamps) is 2:
         changes_timestamps = changes_timestamps[1]
 

@@ -6,9 +6,9 @@ from MapColoniesJSONLogger.logger import generate_logger
 
 app_name = 'cosmocrat-cli'
 
-OSMOSIS_PATH='/usr/bin/osmosis'
-OSMUPDATE_PATH='/usr/bin/osmupdate'
-OSMCONVERT_PATH='/usr/bin/osmconvert'
+OSMOSIS_PATH='osmosis'
+OSMUPDATE_PATH='osmupdate'
+OSMCONVERT_PATH='osmconvert'
 
 Time_Unit = Enum('Time_Unit', 'minute hour day week')
 Subprocess_Tool = Enum('Subprocess_Tool', 'osmosis osmupdate osmconvert')
@@ -51,8 +51,5 @@ EXIT_CODES = {
     'invalid_argument': 128
 }
 
-log_file_extention = '.log'
-base_log_path = os.path.join('/var', 'log', app_name)
-service_logs_path = os.path.join(base_log_path, app_name + log_file_extention)
-os.makedirs(base_log_path, exist_ok=True)
-log = generate_logger(app_name, log_level='INFO', handlers=[{'type': 'rotating_file', 'path': service_logs_path},{ 'type': 'stream', 'output': 'stderr' }])
+log = generate_logger(app_name, log_level='INFO',
+        handlers=[{ 'type': 'stream', 'output': 'stderr' }])

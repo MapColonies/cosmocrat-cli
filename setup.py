@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
-with open("README.md", "r") as fh:
-    long_description = fh.read()
+with open("README.md", "r") as readme_file:
+    long_description = readme_file.read()
 
 setup(
     name="cosmocrat-cli",
@@ -14,7 +14,6 @@ setup(
     packages=find_packages(exclude=["tests"]),
     install_requires=[
         "osmeterium==0.0.3",
-        "pytest",
         "mapcoloniesjsonlogger==1.0.0",
         "validators",
     ],
