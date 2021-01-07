@@ -24,7 +24,7 @@ OSMUPDATE_CACHE_PATH = os.path.join(DATA_PATH, 'osmupdate_temp', 'temp')
 
 TIME_UNITS_IN_USE = ['hour', 'day']
 REPLICATION_SERVER_BASE_URL='https://planet.openstreetmap.org/replication'
-TIMESTAMP_REGEX = r'\b[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}\:[0-9]{2}\:[0-9]{2}Z\b'
+TIMESTAMP_REGEX = r'[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}\:[0-9]{2}\:[0-9]{2}Z'
 FORMATS_MAP = {
     'OSM_PBF': 'osm.pbf',
     'OSM': 'osm',

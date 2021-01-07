@@ -2,18 +2,10 @@ import os
 import cosmocrat.definitions as definitions
 
 from uuid import uuid4
-from cosmocrat.helper_functions import run_command_wrapper
+from cosmocrat.helper_functions import run_command_wrapper, time_units_to_command_string
 from cosmocrat.osm_tools.osmconvert import get_osm_file_timestamp
 
 SUBPROCESS_NAME='osmupdate'
-
-def time_units_to_command_string(time_units):
-    result = ''
-    for time_unit in time_units:
-        if time_unit not in definitions.Time_Unit._member_names_:
-            continue
-        result += f'--{time_unit} '
-    return result
 
 def get_changes_from_timestamp(input_timestamp, changes_format, source, limited_time_units):
     temp_output_name = f'{uuid4()}.{changes_format}'

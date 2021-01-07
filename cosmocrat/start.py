@@ -21,6 +21,7 @@ def create_parser():
     update.register_parser(sub_parsers)
     return parser
 
+# TEST
 def parse_args(parser):
     try:
         return parser.parse_args()
