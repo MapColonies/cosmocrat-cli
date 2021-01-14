@@ -10,9 +10,7 @@
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
-            "args": ["update",
-                "-i=/tmp/cosmocrat-cli/data/results/output2.osm.pbf",
-                 "/tmp/cosmocrat-cli/data/osm-changes/output.osc"]
+            "args": ["-h"]
         }
     ]
 }

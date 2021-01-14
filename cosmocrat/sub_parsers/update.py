@@ -1,5 +1,5 @@
 import cosmocrat.definitions as definitions
-import cosmocrat.action_validators as validators
+import cosmocrat.argument_parser.validation.action_validators as validators
 
 from cosmocrat.helper_functions import safe_copy
 from cosmocrat.osm_tools.osmupdate import get_changes_from_file, get_changes_from_timestamp

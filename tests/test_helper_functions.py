@@ -1,17 +1,13 @@
 import pytest
+import unittest.mock as mock
 from os.path import join
 
 import cosmocrat.definitions as definitions
 import cosmocrat.helper_functions as helpers
-from tests.helpers.helper_functions import get_current_datetime, datetime_to_string
+from tests.helpers.helpers import get_current_datetime, datetime_to_string
 from random import randrange
 from datetime import datetime, timedelta
-
-EMPTY_STRING=''
-FILE_PATH='/tmp/cosmocrat-cli/data'
-FILE_NAME='output'
-FILE_FORMAT='osm.pbf'
-FAKE_MULTI_PURPOSE='xyz'
+from tests.definitions import EMPTY_STRING, FILE_PATH, FILE_NAME, FILE_FORMAT, FAKE_MULTI_PURPOSE, FULL_FILE_PATH
 
 def test_get_compression_method():
     assert helpers.get_compression_method(False) == ('none', EMPTY_STRING)
@@ -87,3 +83,72 @@ def test_get_file_timestamps():
 ])
 def test_time_units_to_command_string(time_units, expected_result):
     assert helpers.time_units_to_command_string(time_units) == expected_result
+
+subprocess_output_dict = {
+    'no_error': {'returncode': 0, 'stdout': f'\n{FAKE_MULTI_PURPOSE}\n'},
+    'error': {'returncode': 1, 'stdout': 'some_error'}
+}
+
+@mock.patch('cosmocrat.helper_functions.subprocess_error_handler_wrapper')
+@mock.patch('cosmocrat.helper_functions.subprocess.run')
+def test_subprocess_get_stdout_output_no_error(mock_subprocess_run, mock_subprocess_error_handler):
+    mock_subprocess_run.return_value = mock.Mock(**subprocess_output_dict.get('no_error'))
+    stdout_output = helpers.subprocess_get_stdout_output(None)
+    mock_subprocess_error_handler.assert_not_called()
+    assert stdout_output == FAKE_MULTI_PURPOSE
+
+@mock.patch('cosmocrat.helper_functions.subprocess_error_handler_wrapper')
+@mock.patch('cosmocrat.helper_functions.subprocess.run')
+def test_subprocess_get_stdout_output_raises_error(mock_subprocess_run, subprocess_error_handler_wrapper):
+    mock_subprocess_run.return_value = mock.Mock(**subprocess_output_dict.get('error'))
+    helpers.subprocess_get_stdout_output(None)
+    mock_subprocess_run.assert_called()
+    subprocess_error_handler_wrapper.assert_called()
+
+@pytest.mark.parametrize("subprocess_name, error_code, logged_message_head", [
+    (EMPTY_STRING, 1, 'The subprocess'),
+    (FAKE_MULTI_PURPOSE, 1, 'The subprocess'),
+    ('osmosis', definitions.EXIT_CODES.get('osmosis_error'), 'osmosis')
+])
+def test_map_subprocess_name_to_error(subprocess_name, error_code, logged_message_head):
+    assert helpers.map_subprocess_name_to_error(subprocess_name) == (error_code, logged_message_head)
+
+@pytest.mark.parametrize("subprocess_name, error_code, logged_message_head, already_raised_exit_code", [
+    (EMPTY_STRING, 1, 'The subprocess', None),
+    (FAKE_MULTI_PURPOSE, 1, 'The subprocess', None),
+    ('osmosis', definitions.EXIT_CODES.get('osmosis_error'), 'osmosis', None),
+    ('osmconvert', 1, 'osmconvert', definitions.EXIT_CODES.get('osmconvert_error'))
+])
+@mock.patch('cosmocrat.helper_functions.log.error')
+@mock.patch('cosmocrat.helper_functions.sys.exit')
+@mock.patch('cosmocrat.helper_functions.map_subprocess_name_to_error')
+def test_subprocess_error_handler_wrapper(
+        mock_subprocess_error,
+        sys_exit,
+        log_error,
+        subprocess_name,
+        error_code,
+        logged_message_head,
+        already_raised_exit_code):
+    mock_subprocess_error.return_value = (error_code, logged_message_head)
+    error_handler_func = helpers.subprocess_error_handler_wrapper(subprocess_name)
+    error_handler_func(exit_code=already_raised_exit_code)
+    log_error.assert_called_with(f'{logged_message_head} raised an error: {already_raised_exit_code}')
+    sys_exit.assert_called_with(error_code)
+
+def test_safe_copy():
+    import shutil
+    test_func = lambda: helpers.safe_copy(EMPTY_STRING, EMPTY_STRING)
+
+    with mock.patch('shutil.copy', side_effect=shutil.SameFileError):
+        assert test_func() is None
+
+    with mock.patch('shutil.copy', side_effect=shutil.Error), pytest.raises(shutil.Error):
+        test_func()
+
+@mock.patch('sys.exit')
+@mock.patch('cosmocrat.helper_functions.log.error')
+def test_log_and_exit(mock_log_error, mock_sys_exit):
+    helpers.log_and_exit(exception_message=EMPTY_STRING, exit_code=EMPTY_STRING)
+    mock_log_error.assert_called_with(EMPTY_STRING)
+    mock_sys_exit.assert_called_with(EMPTY_STRING)

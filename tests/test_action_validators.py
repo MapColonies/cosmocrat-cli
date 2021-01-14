@@ -1,8 +1,10 @@
 import pytest
 import argparse
-from tests.helpers.helper_functions import get_current_datetime, datetime_to_string
+import unittest.mock as mock
+import cosmocrat.argument_parser.validation.action_validators as validators
 
-import cosmocrat.action_validators as validators
+from tests.helpers.helpers import get_current_datetime, datetime_to_string
+from tests.definitions import FULL_FILE_PATH, FILE_PATH, FILE_NAME, FILE_FORMAT, FAKE_MULTI_PURPOSE
 
 @pytest.fixture
 def input_path_validator():
@@ -29,67 +31,52 @@ def url_validator():
     '''Returns an empty validate_url'''
     return validators.validate_url(None, None)
 
-# TODO: find if possible:
-# region get_fixture_from_parametrize
-
-# @pytest.fixture(params=[validate_input_path, validate_output_path])
-# def validator(request):
-#     return request.param(None, None)
-
-# @pytest.mark.parametrize("value, expected", [
-#     ('/tmp/cosmocrat-cli/data/results/output2.osm.pbf', None)
-# ])
-# def test_foo(validator, value, expected):
-#     print(validator)
-#     assert validator.validate(value) is expected
-
-# @pytest.mark.parametrize("value, expected, validator", [
-#     ('/tmp/cosmocrat-cli/data/results/output2.osm.pbf', None, 'input_path_validator')
-# ], indirect=['validator'])
-# def test_valid(input_path_validator, value, expected, validator):
-#     print('!!!')
-#     print(validator)
-#     print(input_path_validator)
-#     assert input_path_validator.validate(value) is expected
-
-# endregion
+@pytest.fixture
+def expected_argument_type_error():
+    '''Returns an expect for raised ArgumentTypeError'''
+    return pytest.raises(argparse.ArgumentTypeError)
 
 @pytest.mark.validators
 class TestValidators():
     def test_validate_input_path(self, input_path_validator):
-        assert input_path_validator.validate(input_file_path='/tmp/cosmocrat-cli/data/results/output2.osm.pbf') is None
+        with mock.patch('os.path.isfile', return_value=True), \
+        mock.patch('os.access', return_value=True):
+            assert input_path_validator.validate(input_file_path=FULL_FILE_PATH) is None
 
-    def test_validate_input_path_raises_exception(self, input_path_validator):
-        with pytest.raises(argparse.ArgumentTypeError):
-            input_path_validator.validate(input_file_path='non_exist_path')
+    def test_validate_input_path_raises_exception(self, input_path_validator, expected_argument_type_error):
+        with mock.patch('os.path.isfile', return_value=False), expected_argument_type_error:
+            input_path_validator.validate(input_file_path=FAKE_MULTI_PURPOSE)
+        with mock.patch('os.path.isfile', return_value=True), \
+        mock.patch('os.access', return_value=False), \
+        expected_argument_type_error:
+            input_path_validator.validate(input_file_path=FAKE_MULTI_PURPOSE)
 
     def test_validate_output_path(self, output_path_validator):
-        assert output_path_validator.validate(output_file_path='/tmp/cosmocrat-cli/data/output.osc') is None
+        with mock.patch('os.access', return_value=True):
+            assert output_path_validator.validate(output_file_path=FULL_FILE_PATH) is None
 
-    def test_validate_output_path_raises_exception(self, output_path_validator):
-        with pytest.raises(argparse.ArgumentTypeError):
-            output_path_validator.validate(output_file_path='non_exist_path')
+    def test_validate_output_path_raises_exception(self, output_path_validator, expected_argument_type_error):
+        with mock.patch('os.access', return_value=False), expected_argument_type_error:
+            output_path_validator.validate(output_file_path=FAKE_MULTI_PURPOSE)
 
     def test_validate_timestamp(self, timestamp_validator):
         now = datetime_to_string(get_current_datetime())
         assert timestamp_validator.validate(timestamp=now) is None
 
-    def test_validate_timestamp_raises_exception(self, timestamp_validator):
-        with pytest.raises(argparse.ArgumentTypeError):
-            timestamp_validator.validate(timestamp='invalid_timestamp')
+    def test_validate_timestamp_raises_exception(self, timestamp_validator, expected_argument_type_error):
+        with expected_argument_type_error:
+            timestamp_validator.validate(timestamp=FAKE_MULTI_PURPOSE)
 
     def test_validate_time_units_limit(self, time_units_limit_validator):
-        assert time_units_limit_validator.validate(time_units=['day']) is None
-        assert time_units_limit_validator.validate(time_units=['day', 'week', 'hour']) is None
-        assert time_units_limit_validator.validate(time_units=[]) is None
+        for case in [['day'], ['day', 'week', 'hour'], []]:
+            assert time_units_limit_validator.validate(time_units=case) is None
 
-    def test_validate_time_units_limit_raises_exception(self, time_units_limit_validator):
-        with pytest.raises(argparse.ArgumentTypeError):
-            time_units_limit_validator.validate(time_units=None)
-            time_units_limit_validator.validate(time_units='day')
-            time_units_limit_validator.validate(time_units=['year'])
+    def test_validate_time_units_limit_raises_exception(self, time_units_limit_validator, expected_argument_type_error):
+        for case in [None, 'day', ['year']]:
+            with expected_argument_type_error:
+                time_units_limit_validator.validate(time_units=case)
 
-    def test_validate_url_raises_exception(self, url_validator):
-        with pytest.raises(argparse.ArgumentTypeError):
-            url_validator.validate(url=None)
-            url_validator.validate(url='invalid_url')
+    def test_validate_url_raises_exception(self, url_validator, expected_argument_type_error):
+        for case in [None, FAKE_MULTI_PURPOSE]:
+            with expected_argument_type_error:
+                url_validator.validate(url=case)

@@ -15,6 +15,7 @@ pipenv-setup = "*"
 pylint = "*"
 cosmocrat-cli = {editable = true, path = "."}
 pytest-mock = "*"
+coverage = "*"
 
 [requires]
 python_version = "3.6"

@@ -4,7 +4,8 @@ import tempfile
 from enum import Enum
 from MapColoniesJSONLogger.logger import generate_logger
 
-app_name = 'cosmocrat-cli'
+PROG_NAME='cosmocrat'
+APP_NAME=f'{PROG_NAME}-cli'
 
 OSMOSIS_PATH='osmosis'
 OSMUPDATE_PATH='osmupdate'
@@ -14,7 +15,7 @@ Time_Unit = Enum('Time_Unit', 'minute hour day week')
 Subprocess_Tool = Enum('Subprocess_Tool', 'osmosis osmupdate osmconvert')
 
 TEMP_PATH = tempfile.gettempdir()
-TEMP_APP_PATH = os.path.join(TEMP_PATH, app_name)
+TEMP_APP_PATH = os.path.join(TEMP_PATH, APP_NAME)
 DATA_PATH = os.path.join(TEMP_APP_PATH, 'data')
 OSMCHANGES_PATH = os.path.join(DATA_PATH, 'osm-changes')
 RESULTS_PATH = os.path.join(DATA_PATH, 'results')
@@ -50,6 +51,7 @@ EXIT_CODES = {
     'not_found': 127,
     'invalid_argument': 128
 }
+GENERAL_ERROR_MESSAGE='an error occurred, please try again'
 
-log = generate_logger(app_name, log_level='INFO',
+log = generate_logger(APP_NAME, log_level='INFO',
         handlers=[{ 'type': 'stream', 'output': 'stderr' }])

@@ -55,4 +55,11 @@ The program is invoked by command, a command can be successful or not. in any ca
     - not_found: 127 - the invoked command does not exist.
     - invalid_argument: 128 - an invalid argument was given.
 
-For additional info on given errors logs are located in /var/log/cosmocrat-cli/
+For additional info on given errors read the stderr output stream
+
+**Tests:**
+
+run tests with
+```
+python -m pytest
+```

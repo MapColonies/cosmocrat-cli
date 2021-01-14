@@ -1,6 +1,6 @@
 import cosmocrat.definitions as definitions
 
-from cosmocrat.action_validators import validate_input_path, validate_output_path
+from cosmocrat.argument_parser.validation.action_validators import validate_input_path, validate_output_path
 from cosmocrat.osm_tools.osmosis import create_delta
 from cosmocrat.helper_functions import deconstruct_file_path, safe_copy
 

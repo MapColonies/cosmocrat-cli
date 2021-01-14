@@ -1,7 +1,7 @@
 import cosmocrat.definitions as definitions
 
 from cosmocrat.helper_functions import safe_copy
-from cosmocrat.action_validators import validate_input_path, validate_output_path
+from cosmocrat.argument_parser.validation.action_validators import validate_input_path, validate_output_path
 from cosmocrat.osm_tools.osmosis import clip_polygon
 from cosmocrat.osm_tools.osmconvert import get_osm_file_timestamp, set_osm_file_timestamp
 

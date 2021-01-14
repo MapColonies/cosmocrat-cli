@@ -13,16 +13,19 @@ def log_and_exit(exception_message, exit_code):
     log.error(exception_message)
     sys.exit(exit_code)
 
-# TEST
-def subprocess_error_handler_wrapper(subprocess_name, already_raised_exit_code=None):
+def map_subprocess_name_to_error(subprocess_name):
     exit_code_value = 'general_error'
     logged_message_head = 'The subprocess'
     if subprocess_name in Subprocess_Tool._member_names_:
         exit_code_value = f'{subprocess_name}_error'
         logged_message_head = subprocess_name
+    return (definitions.EXIT_CODES[exit_code_value], logged_message_head)
+
+def subprocess_error_handler_wrapper(subprocess_name, already_raised_exit_code=None):
+    (exit_code_value, logged_message_head) = map_subprocess_name_to_error(subprocess_name)
     def error_handler(exit_code=already_raised_exit_code):
-        log.error(fr'{logged_message_head} raised an error: {exit_code}')
-        sys.exit(definitions.EXIT_CODES[exit_code_value])
+        log.error(f'{logged_message_head} raised an error: {exit_code}')
+        sys.exit(exit_code_value)
     return error_handler
 
 def run_command_wrapper(command, subprocess_name=''):
@@ -32,7 +35,6 @@ def run_command_wrapper(command, subprocess_name=''):
                 subprocess_error_handler_wrapper(subprocess_name),
                 (lambda: log.info(f'subprocess {subprocess_name} finished successfully.')))
 
-# TEST
 def subprocess_get_stdout_output(args, subprocess_name=''):
     completed_process = subprocess.run(args=args,
                                         stdout=subprocess.PIPE,
@@ -40,7 +42,7 @@ def subprocess_get_stdout_output(args, subprocess_name=''):
                                         universal_newlines=True)
     return_code = completed_process.returncode
     if return_code is not 0:
-        subprocess_error_handler_wrapper(subprocess_name,
+        return subprocess_error_handler_wrapper(subprocess_name,
                                         already_raised_exit_code=return_code)()
     output = completed_process.stdout
     return output.strip()
