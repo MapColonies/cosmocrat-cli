@@ -22,16 +22,16 @@ def test_get_compression_method():
         (definitions.COMPRESSION_METHOD_MAP.get('bz2'), f'{FILE_FORMAT}.bz2')
 
 def test_deconstruct_file_path():
-    assert helpers.deconstruct_file_path(EMPTY_STRING) == (None, EMPTY_STRING, [], None)
+    assert helpers.deconstruct_file_path(EMPTY_STRING) == (None, EMPTY_STRING, None, None)
 
     name_and_format = f'{FILE_NAME}.{FILE_FORMAT}'
     assert helpers.deconstruct_file_path(join(FILE_PATH, name_and_format)) == \
-        (FILE_PATH, FILE_NAME, [], FILE_FORMAT)
+        (FILE_PATH, FILE_NAME, None, FILE_FORMAT)
 
     timestamp = datetime_to_string(get_current_datetime())
-    assert helpers.deconstruct_file_path(join(FILE_PATH, timestamp)) == (FILE_PATH, EMPTY_STRING, [timestamp], None)
+    assert helpers.deconstruct_file_path(join(FILE_PATH, timestamp)) == (FILE_PATH, EMPTY_STRING, timestamp, None)
     assert helpers.deconstruct_file_path(join(FILE_PATH, f'{timestamp}.{name_and_format}')) \
-        == (FILE_PATH, FILE_NAME, [timestamp], FILE_FORMAT)
+        == (FILE_PATH, FILE_NAME, timestamp, FILE_FORMAT)
 
 @pytest.mark.parametrize("value, successful, output_format, rest", [
     (EMPTY_STRING, False, None, EMPTY_STRING),

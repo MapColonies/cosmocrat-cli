@@ -1,16 +1,17 @@
 import pytest
 import unittest.mock as mock
 import os
+import cosmocrat.definitions as definitions
 
 from cosmocrat.osm_tools import osmconvert
-from cosmocrat.definitions import OSMCONVERT_PATH
 from tests.definitions import EMPTY_STRING, FILE_PATH, FILE_NAME, FILE_FORMAT, FAKE_MULTI_PURPOSE
-from tests.helpers.helpers import ArgumentWildcard
+from tests.helpers.helpers import Expected_In_Arg
 
 SUBPROCESS_NAME=osmconvert.SUBPROCESS_NAME
 OSMCONVERT_MODULE_PATH='cosmocrat.osm_tools.osmconvert'
 
 @pytest.mark.osm_tools
+@mock.patch('cosmocrat.definitions.OSMCONVERT_PATH', FAKE_MULTI_PURPOSE)
 class TestOsmconvert():
     @mock.patch(f'{OSMCONVERT_MODULE_PATH}.subprocess_get_stdout_output')
     def test_get_osm_file_timestamp(self, mock_get_stdout):
@@ -20,10 +21,10 @@ class TestOsmconvert():
 
         # arguments in command
         mock_get_stdout.assert_called_with(
-            args=[OSMCONVERT_PATH,
+            args=[definitions.OSMCONVERT_PATH,
             '--out-timestamp',
             input_path,
-            ArgumentWildcard()],
+            mock.ANY],
             subprocess_name=SUBPROCESS_NAME)
 
         # result
@@ -46,21 +47,16 @@ class TestOsmconvert():
         _, kwargs = mock_run_command_wrapper.call_args
         command = kwargs.get('command')
 
-        # command starts with
-        assert command.startswith(OSMCONVERT_PATH)
-
         # arguments in command
         expected_in_command = [input_path, f'--timestamp={timestamp}', f'-o={temp_file_name}']
-        for expected in expected_in_command:
-            assert expected in command
 
         # arguments in wrapper
         mock_run_command_wrapper.assert_called_with(
-            command=ArgumentWildcard(),
+            command=Expected_In_Arg(expressions=expected_in_command, head=definitions.OSMCONVERT_PATH),
             subprocess_name=SUBPROCESS_NAME)
 
         # mocked functions
-        mock_rename.assert_called_with(ArgumentWildcard(), res)
+        mock_rename.assert_called_with(mock.ANY, res)
 
         # result
         assert res == os.path.join(FILE_PATH, f'{FILE_NAME}.{timestamp}.{FILE_FORMAT}')
@@ -80,17 +76,12 @@ class TestOsmconvert():
         _, kwargs = mock_run_command_wrapper.call_args
         command = kwargs.get('command')
 
-        # command starts with
-        assert command.startswith(OSMCONVERT_PATH)
-
         # arguments in command
         expected_in_command = ['--drop-author', input_path, f'-o={output_path}']
-        for expected in expected_in_command:
-            assert expected in command
 
         # arguments in wrapper
         mock_run_command_wrapper.assert_called_with(
-            command=ArgumentWildcard(),
+            command=Expected_In_Arg(expression=expected_in_command, head=definitions.OSMCONVERT_PATH),
             subprocess_name=SUBPROCESS_NAME)
 
         # mocked functions
@@ -114,17 +105,12 @@ class TestOsmconvert():
         _, kwargs = mock_run_command_wrapper.call_args
         command = kwargs.get('command')
 
-        # command starts with
-        assert command.startswith(OSMCONVERT_PATH)
-
         # arguments in command
         expected_in_command = ['--drop-author', input_path, f'-o={output_path}']
-        for expected in expected_in_command:
-            assert expected in command
 
         # arguments in wrapper
         mock_run_command_wrapper.assert_called_with(
-            command=ArgumentWildcard(),
+            command=Expected_In_Arg(expressions=expected_in_command, head=definitions.OSMCONVERT_PATH),
             subprocess_name=SUBPROCESS_NAME)
 
         # mocked functions

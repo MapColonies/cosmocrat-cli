@@ -61,7 +61,8 @@ def deconstruct_file_path(string):
     (_, dir, string) = get_file_dir(string)
     (_, timestamps, string) = get_file_timestamps(string)
     name = remove_dots_from_edges_of_string(string)
-    return (dir, name, timestamps, format)
+    timestamp = timestamps[-1] if timestamps else None
+    return (dir, name, timestamp, format)
 
 def get_file_format(input):
     file_format = None

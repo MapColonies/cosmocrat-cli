@@ -5,7 +5,7 @@ import argparse
 
 from cosmocrat.argument_parser.custom_argument_parser import CustomArgumentParser
 from cosmocrat.start import argparse_parse_args, create_parser
-from tests.helpers.helpers import ArgumentWildcard, ARGPARSE_ERROR_MAP
+from tests.helpers.helpers import ARGPARSE_ERROR_MAP
 
 @pytest.fixture
 def custom_argument_parser():
@@ -112,7 +112,7 @@ def test_argparse_parse_args_error(
     mock_parse_args.assert_called()
     mock_print_help.assert_called() if should_call_help else mock_print_help.assert_not_called()
     mock_log_and_exit.assert_called_with(
-        exception_message=ArgumentWildcard(),
+        exception_message=mock.ANY,
         exit_code=expected_map['exit_code'])
 
 def test_create_parser():

@@ -10,8 +10,17 @@ def get_current_datetime():
 def datetime_to_string(datetime):
     return datetime.strftime(r'%Y-%m-%dT%H:%M:%SZ')
 
-class ArgumentWildcard():
-    def __eq__(_, __):
+class Expected_In_Arg():
+    def __init__(self, **kwargs):
+        self.expressions = kwargs.get('expressions', [])
+        self.head = kwargs.get('head')
+
+    def __eq__(self, argument):
+        if self.head and not argument.startswith(self.head):
+            return False
+        for expression in self.expressions:
+            if expression not in argument:
+                return False
         return True
 
 ARGPARSE_ERROR_MAP = {

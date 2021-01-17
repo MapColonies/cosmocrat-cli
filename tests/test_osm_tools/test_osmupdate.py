@@ -4,13 +4,16 @@ import os
 import cosmocrat.definitions as definitions
 
 from cosmocrat.osm_tools import osmupdate
-from tests.helpers.helpers import ArgumentWildcard, get_current_datetime, datetime_to_string
+from tests.helpers.helpers import get_current_datetime, datetime_to_string
 from tests.definitions import EMPTY_STRING, FILE_FORMAT, FAKE_MULTI_PURPOSE
+from tests.helpers.helpers import Expected_In_Arg
 
 SUBPROCESS_NAME=osmupdate.SUBPROCESS_NAME
 OSMUPDATE_MODULE_PATH='cosmocrat.osm_tools.osmupdate'
 
 @pytest.mark.osm_tools
+@mock.patch('cosmocrat.definitions.OSMUPDATE_PATH', FAKE_MULTI_PURPOSE)
+@mock.patch('cosmocrat.definitions.OSMUPDATE_CACHE_PATH', FAKE_MULTI_PURPOSE)
 @mock.patch(f'{OSMUPDATE_MODULE_PATH}.uuid4', return_value='uuid')
 @mock.patch(f'{OSMUPDATE_MODULE_PATH}.get_osm_file_timestamp', return_value=FAKE_MULTI_PURPOSE)
 @mock.patch(f'{OSMUPDATE_MODULE_PATH}.run_command_wrapper')
@@ -43,9 +46,6 @@ class TestOsmupdate():
         _, kwargs = mock_run_command_wrapper.call_args
         command = kwargs.get('command')
 
-        # command starts with
-        assert command.startswith(definitions.OSMUPDATE_PATH)
-
         # arguments in command
         expected_in_command = [input_path_or_timestamp,
                                 inner_output_path,
@@ -53,12 +53,10 @@ class TestOsmupdate():
                                 f'--tempfiles={definitions.OSMUPDATE_CACHE_PATH}',
                                 '--keep-tempfiles',
                                 '--trust-tempfiles']
-        for expected in expected_in_command:
-            assert expected in command
 
         # arguments in wrapper
         mock_run_command_wrapper.assert_called_with(
-            command=ArgumentWildcard(),
+            command=Expected_In_Arg(expressions=expected_in_command, head=definitions.OSMUPDATE_PATH),
             subprocess_name=SUBPROCESS_NAME)
 
         # mocked functions

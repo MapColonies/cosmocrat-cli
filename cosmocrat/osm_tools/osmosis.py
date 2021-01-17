@@ -29,9 +29,6 @@ def apply_changes_by_polygon(base_output_path, input_path, change_path, polygon_
 
     compression_type = definitions.COMPRESSION_METHOD_MAP[changes_format]
 
-    if len(changes_timestamps) is 2:
-        changes_timestamps = changes_timestamps[1]
-
     output_format = definitions.FORMATS_MAP['OSM_PBF']
     output_path = os.path.join(base_output_path, f'{input_name}.{changes_timestamps}.{output_format}')
 
@@ -46,7 +43,7 @@ def apply_changes_by_polygon(base_output_path, input_path, change_path, polygon_
     return output_path
 
 def create_delta(delta_path, delta_name, first_input_pbf_path, second_input_pbf_path, should_compress=False):
-    (compression_type, output_format) = get_compression_method(should_compress, base_format=definitions.FORMATS_MAP['OSC'])
+    (compression_type, output_format) = get_compression_method(compression=should_compress, base_format=definitions.FORMATS_MAP['OSC'])
     output_name = f'{delta_name}.{output_format}'
     output_path = os.path.join(delta_path, output_name)
     run_command_wrapper(command=f'{definitions.OSMOSIS_PATH} \
