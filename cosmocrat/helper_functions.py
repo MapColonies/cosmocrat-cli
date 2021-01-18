@@ -7,20 +7,25 @@ import cosmocrat.definitions as definitions
 
 from osmeterium.run_command import run_command
 from cosmocrat.definitions import log, Subprocess_Tool
+from collections.abc import Iterable
 
 def log_and_exit(exception_message, exit_code):
     log.error(exception_message)
     sys.exit(exit_code)
 
-def subprocess_error_handler_wrapper(subprocess_name, already_raised_exit_code=None):
+def map_subprocess_name_to_error(subprocess_name):
     exit_code_value = 'general_error'
     logged_message_head = 'The subprocess'
     if subprocess_name in Subprocess_Tool._member_names_:
         exit_code_value = f'{subprocess_name}_error'
         logged_message_head = subprocess_name
+    return (definitions.EXIT_CODES[exit_code_value], logged_message_head)
+
+def subprocess_error_handler_wrapper(subprocess_name, already_raised_exit_code=None):
+    (exit_code_value, logged_message_head) = map_subprocess_name_to_error(subprocess_name)
     def error_handler(exit_code=already_raised_exit_code):
-        log.error(fr'{logged_message_head} raised an error: {exit_code}')
-        sys.exit(definitions.EXIT_CODES[exit_code_value])
+        log.error(f'{logged_message_head} raised an error: {exit_code}')
+        sys.exit(exit_code_value)
     return error_handler
 
 def run_command_wrapper(command, subprocess_name=''):
@@ -37,47 +42,48 @@ def subprocess_get_stdout_output(args, subprocess_name=''):
                                         universal_newlines=True)
     return_code = completed_process.returncode
     if return_code is not 0:
-        subprocess_error_handler_wrapper(subprocess_name,
+        return subprocess_error_handler_wrapper(subprocess_name,
                                         already_raised_exit_code=return_code)()
     output = completed_process.stdout
     return output.strip()
 
-def get_compression_method(compression, base_format='', default_compression_method='gz'):
+def get_compression_method(compression, base_format='', selected_compression_method='gz'):
     compression_type = 'none'
     compression_format = base_format
-    if compression:
-        compression_type = definitions.COMPRESSION_METHOD_MAP.get(default_compression_method)
-        compression_format += f'.{default_compression_method}'
+    compression_method = definitions.COMPRESSION_METHOD_MAP.get(selected_compression_method)
+    if compression and compression_method:
+        compression_type = compression_method
+        compression_format += f'.{selected_compression_method}'
     return (compression_type, compression_format)
 
 def deconstruct_file_path(string):
     (_, format, string) = get_file_format(string)
     (_, dir, string) = get_file_dir(string)
     (_, timestamps, string) = get_file_timestamps(string)
-    if len(timestamps) is 1:
-        timestamps = timestamps[0]
     name = remove_dots_from_edges_of_string(string)
-    return (dir, name, timestamps, format)
+    timestamp = timestamps[-1] if timestamps else None
+    return (dir, name, timestamp, format)
 
 def get_file_format(input):
-    format = ''
+    file_format = None
     successful = False
     rest = input
     for format_value in definitions.FORMATS_MAP.values():
         index = input.find(f'.{format_value}')
-        if index is not -1 and len(format) < len(format_value):
-            format = format_value
+        if index is not -1:
+            if successful and len(file_format) > len(format_value):
+                continue
+            file_format = format_value
             successful = True
     if successful:
-        rest = input[:input.rfind(format)]
-    return (successful, format, rest)
+        rest = input[:input.rfind(file_format) - 1]
+    return (successful, file_format, rest)
 
 def get_file_dir(input):
-    index = input.rfind('/')
-    if index is -1:
+    path = os.path.dirname(input)
+    if path == '':
         return (False, None, input)
-    path = input[:index]
-    rest = input[index + 1:]
+    rest = os.path.basename(input)
     return (True, path, rest)
 
 def get_file_timestamps(input):
@@ -104,3 +110,17 @@ def safe_copy(src, dst):
         shutil.copy(src, dst)
     except shutil.SameFileError:
         pass
+
+def is_iterable(input):
+    return isinstance(input, Iterable)
+
+def time_units_to_command_string(time_units):
+    result = ''
+    if not is_iterable(time_units):
+        return result
+    time_units = dict.fromkeys(time_units)
+    for time_unit in time_units:
+        if time_unit not in definitions.Time_Unit._member_names_:
+            continue
+        result += f'--{time_unit} '
+    return result

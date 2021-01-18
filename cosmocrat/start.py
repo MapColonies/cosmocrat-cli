@@ -1,7 +1,7 @@
 import os
 import argparse
 
-from cosmocrat.custom_argument_parser import CustomArgumentParser
+from cosmocrat.argument_parser.custom_argument_parser import CustomArgumentParser
 from cosmocrat.helper_functions import log_and_exit
 
 import cosmocrat.definitions as definitions
@@ -12,7 +12,7 @@ import cosmocrat.sub_parsers.drop as drop
 import cosmocrat.sub_parsers.update as update
 
 def create_parser():
-    parser = CustomArgumentParser(prog='cosmocrat')
+    parser = CustomArgumentParser(prog=definitions.PROG_NAME)
     sub_parsers = parser.add_subparsers(dest='command', metavar='<command>')
     apply.register_parser(sub_parsers)
     clip.register_parser(sub_parsers)
@@ -21,7 +21,7 @@ def create_parser():
     update.register_parser(sub_parsers)
     return parser
 
-def parse_args(parser):
+def argparse_parse_args(parser):
     try:
         return parser.parse_args()
     except argparse.ArgumentTypeError as arg_type_exc:
@@ -30,13 +30,14 @@ def parse_args(parser):
     except argparse.ArgumentError as arg_exc:
         exc_message = f'{arg_exc.argument_name}: {arg_exc.message}'
         exit_code = definitions.EXIT_CODES['invalid_argument']
-        if arg_exc.argument.dest is 'command':
+        if hasattr(arg_exc, 'argument') and getattr(arg_exc.argument, 'dest') is 'command':
             parser.print_help()
             exit_code = definitions.EXIT_CODES['not_found']
         log_and_exit(exception_message=exc_message,
                     exit_code=exit_code)
     except:
-        exit(definitions.EXIT_CODES['general_error'])
+        log_and_exit(exception_message=definitions.GENERAL_ERROR_MESSAGE,
+                    exit_code=definitions.EXIT_CODES['general_error'])
 
 def prepare_env():
     os.makedirs(definitions.RESULTS_PATH, exist_ok=True)
@@ -48,7 +49,7 @@ def prepare_env():
 def main():
     prepare_env()
     parser = create_parser()
-    args = parse_args(parser)
+    args = argparse_parse_args(parser)
     args.func(args)
     exit(definitions.EXIT_CODES['success'])
 
