@@ -60,6 +60,15 @@ For additional info on given errors read the stderr output stream
 **Tests:**
 
 run tests with
-```
+```sh
 python -m pytest
 ```
+
+to view test coverage run
+```sh
+coverage run --source=. -m pytest &&
+coverage report -m &&
+coverage html
+```
+a coverage html report can be found in:
+`./htmlcov/index.html`
